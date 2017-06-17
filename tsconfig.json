@@ -1,0 +1,18 @@
+{
+  "files": [
+    "./index.ts"
+  ],
+  "indentSize": 2,
+  "tabSize": 2,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "es5",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "removeComments": true,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "sourceMap": true
+  }
+}

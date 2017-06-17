@@ -1,0 +1,28 @@
+{
+  "name": "htmltabletolatex",
+  "version": "1.0.0",
+  "description": "Converting html tables to latex tables",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juliandavidmr/HtmlTableToLatex.git"
+  },
+  "keywords": [
+    "latex",
+    "javascript",
+    "tables",
+    "html"
+  ],
+  "author": "\u001ba@anlijudavid <anlijudavid@hotmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/juliandavidmr/HtmlTableToLatex/issues"
+  },
+  "homepage": "https://github.com/juliandavidmr/HtmlTableToLatex#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.1"
+  }
+}
