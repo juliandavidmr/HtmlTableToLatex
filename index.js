@@ -121,8 +121,11 @@ var HtmlTableToLatex = (function () {
     return HtmlTableToLatex;
 }());
 exports.HtmlTableToLatex = HtmlTableToLatex;
+exports.HTTL = new HtmlTableToLatex();
+/*
 var hl = new HtmlTableToLatex();
-hl.latex("export.html").then(function (latex) {
-    // console.log("Latex", latex);
-    hl.save('latex.tex', latex.join('\n'));
+hl.latex("export.html").then(latex => {
+  // console.log("Latex", latex);
+  hl.save('latex.tex', latex.join('\n'));
 });
+*/ 

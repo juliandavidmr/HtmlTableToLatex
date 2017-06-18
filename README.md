@@ -1,18 +1,82 @@
 # HtmlTableToLatex
-Converting html tables to latex tables
 
-## Usage
+Converter html tables tables in latex
 
-Install NodeJS
-
+## Installation
 ```bash
-$ https://github.com/juliandavidmr/HtmlTableToLatex.git
-$ cd HtmlTableToLatex
-# Edit file index.js line 99 
-# Replace "export.html" with the name of your html file
-# Next, run:
-$ node index.js
-# => A latex file called "latex.tex" is automatically generated
+$ npm install htmltabletolatex --save
 ```
 
-**License MIT**
+## Usage
+```js
+// httl = HtmlTableToLatex 
+var httl = require('htmltabletolatex').HTTL;
+
+httl.latex("mytables.html").then(latex => {
+	// console.log("Latex tables:", latex);
+	httl.save('latex.tex', latex.join('\n'), (err, success) => {});
+});
+```
+
+## Example
+
+#### Html input
+```html
+<table>
+    <caption>Table: usuario </caption>        
+    <tr>
+        <th>Name</th>
+        <th>Data Type</th>
+        <th>Nullable</th>
+        <th>PK</th>
+        <th>FK</th>
+        <th>Default</th>
+        <th>Comment</th>
+    </tr>
+    <tr>
+        <td>user_idUsuario</td>
+        <td>VARCHAR(45)</td>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td>No</td>
+        <td></td>
+        <td></td>
+    </tr>        
+    <tr>
+        <td>user_Correo</td>
+        <td>VARCHAR(45)</td>
+        <td>Yes</td>
+        <td>No</td>
+        <td>No</td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+```
+#### Latex output
+```tex
+\begin{center}
+	\caption{tableTableUsuario}
+	\label{labelTableUsuario}
+	\begin{tabular}{ |l|l|l|l|l|l|l| }
+		\hline
+		Name & DataType & Nullable & PK & FK & Default & Comment \\
+		UserIdUsuario & VARCHAR(45) & Yes & Yes & No &  & \\ \hline
+		UserCorreo & VARCHAR(45) & Yes & No & No &  & \\ \hline		
+	\end{tabular}
+\end{center}
+```
+
+## Colaborate
+```bash
+# Fork it this repo
+# Install typescript cli
+$ git clone https://github.com/<your-username>/HtmlTableToLatex.git
+$ cd HtmlTableToLatex
+# Edit & transpile file index.ts
+# Commit + push + Pull request
+```
+
+### License MIT
+
+This software is released under the [MIT License](./LICENSE).

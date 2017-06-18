@@ -37,17 +37,17 @@ export class HtmlTableToLatex {
     })
   }
 
-  camelize(string: string) {
+  private camelize(string: string) {
     return string.replace(/(?:^|[-_ :])(\w)/g, function (_, c) {
       return c ? c.toUpperCase() : '';
     })
   }
 
-  camelizeList(list: Array<string>) {
+  private camelizeList(list: Array<string>) {
     return list.map(item => this.camelize(item));
   }
 
-  camelizeRows(rows: Array<Array<string>>) {
+  private camelizeRows(rows: Array<Array<string>>) {
     return rows.map((sub_list:Array<string>) => sub_list.map(str => this.camelize(str)))
   }
 
@@ -139,8 +139,11 @@ export class HtmlTableToLatex {
   }
 }
 
+export const HTTL = new HtmlTableToLatex();
+/*
 var hl = new HtmlTableToLatex();
 hl.latex("export.html").then(latex => {
   // console.log("Latex", latex);
   hl.save('latex.tex', latex.join('\n'));
 });
+*/
