@@ -3,9 +3,22 @@ exports.__esModule = true;
 var fs = require("fs");
 var cheerio = require("cheerio");
 var HtmlTableToLatex = (function () {
-    function HtmlTableToLatex(args) {
+    function HtmlTableToLatex(minLengthColumnsByRow, separator, lines) {
+        if (minLengthColumnsByRow === void 0) { minLengthColumnsByRow = 3; }
+        if (separator === void 0) { separator = 'l'; }
+        if (lines === void 0) { lines = true; }
         this.minLengthColumnsByRow = 3;
+        this.separator = 'l';
+        this.lines = true;
+        this.minLengthColumnsByRow = minLengthColumnsByRow;
+        this.separator = separator;
+        this.lines = lines;
     }
+    /**
+     * Read content file
+     * @param dirname
+     * @param format
+     */
     HtmlTableToLatex.prototype.prepare = function (dirname, format) {
         var _this = this;
         if (format === void 0) { format = 'utf8'; }
@@ -19,17 +32,29 @@ var HtmlTableToLatex = (function () {
             });
         });
     };
+    /**
+     * Returns a latex table
+     * @param caption
+     * @param colums
+     * @param rowContent
+     */
     HtmlTableToLatex.prototype.toTableLatex = function (caption, colums, rowContent) {
+        var _this = this;
         if (colums === void 0) { colums = []; }
         if (rowContent === void 0) { rowContent = []; }
-        var l = colums.map(function (_) { return 'l'; }).join('');
+        var l = (this.lines ? '|' : '') + colums.map(function (_) { return 'l'; }).join(this.lines ? '|' : '') + (this.lines ? '|' : '');
         var prepareContent = [];
-        rowContent.map(function (row) { return prepareContent.push(row.join(' & ') + ' \\\\ \n'); });
-        return "\n\t\t\tcaption{" + caption + "}\n\t\t\t\begin{tabular}{" + l + "}\n\t\t\t\t" + colums.join(' & ') + "\\\n\t\t\t\t" + prepareContent.join('') + "\n\t\t\tend{tabular}\n\t\t\tend{table}\n\t\t";
+        rowContent.map(function (row) { return prepareContent.push(row.join(' & ') + ("\\\\ " + (_this.lines ? '\\hline' : '') + " \n")); });
+        return "\n\t\t\t\\begin{center}\n\t\t\t\t\\begin{tabular}{ " + l + " }\n\t\t\t\t\t" + (this.lines ? '\\hline' : '') + "\n\t\t\t\t\t" + colums.join(' & ') + " \\\\\n\t\t\t\t\t" + prepareContent.join('') + "\n\t\t\t\t\\end{tabular}\n\t\t\t\\end{center}\n\t\t";
     };
+    /**
+     * Converts many html tables into latex tables
+     * @param html
+     * @param dirname
+     */
     HtmlTableToLatex.prototype.toLatex = function (html, dirname) {
         var _this = this;
-        var $;
+        var $, templates_list = [];
         if (dirname === void 0 && this.contentHtml) {
             $ = cheerio.load(this.contentHtml);
         }
@@ -51,14 +76,27 @@ var HtmlTableToLatex = (function () {
             });
             // console.log("Content:", rows);
             var template_temp = _this.toTableLatex(caption || 'Caption ' + i, columnsText, rows);
-            console.log("Item", i, caption, "\nTemplate:", template_temp);
+            templates_list.push(template_temp);
+            // console.log("Item", i, caption, "\nTemplate:", template_temp);
         });
-        return;
+        return templates_list;
+    };
+    HtmlTableToLatex.prototype.latex = function (dirname) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            _this.prepare(dirname).then(function (_) {
+                return resolve(_this.toLatex());
+            }, function (err) { return reject(err); });
+        });
+    };
+    HtmlTableToLatex.prototype.save = function (dirname, content, cb) {
+        fs.writeFile(dirname, content, cb);
     };
     return HtmlTableToLatex;
 }());
 exports.HtmlTableToLatex = HtmlTableToLatex;
 var hl = new HtmlTableToLatex();
-hl.prepare("export.html").then(function (html) {
-    hl.toLatex();
+hl.latex("export.html").then(function (latex) {
+    // console.log("Latex", latex);
+    hl.save('latex.tex', latex.join('\n'));
 });

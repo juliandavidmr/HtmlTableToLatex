@@ -7,11 +7,25 @@ export class HtmlTableToLatex {
 
 	contentHtml: string;
 	minLengthColumnsByRow: number = 3;
+	separator: string = 'l';
+	lines: boolean = true;
 
-	constructor(args?) {
+	constructor(
+		minLengthColumnsByRow: number = 3,
+		separator: string = 'l',
+		lines: boolean = true
+	) {
+		this.minLengthColumnsByRow = minLengthColumnsByRow;
+		this.separator = separator;
+		this.lines = lines;
 	}
 
-	prepare(dirname: string, format: string = 'utf8') {
+	/**
+	 * Read content file
+	 * @param dirname 
+	 * @param format 
+	 */
+	public prepare(dirname: string, format: string = 'utf8') {
 		return new Promise((resolve, reject) => {
 			fs.readFile(dirname, format, (err, data) => {
 				if (err) {
@@ -23,22 +37,34 @@ export class HtmlTableToLatex {
 		})
 	}
 
-	toTableLatex(caption: string, colums: Array<string> = [], rowContent: Array<Array<string>> = []) {
-		let l: string = colums.map(_ => 'l').join('');
+	/**
+	 * Returns a latex table
+	 * @param caption 
+	 * @param colums 
+	 * @param rowContent 
+	 */
+	public toTableLatex(caption: string, colums: Array<string> = [], rowContent: Array<Array<string>> = []): string {
+		let l: string = (this.lines ? '|' : '') + colums.map(_ => 'l').join(this.lines ? '|' : '') + (this.lines ? '|' : '');
 		let prepareContent: Array<string> = [];
-		rowContent.map(row => prepareContent.push(row.join(' & ') + ' \\\\ \n'))
+		rowContent.map(row => prepareContent.push(row.join(' & ') + `\\\\ ${this.lines ? '\\hline' : ''} \n`))
 		return `
-			\caption{${caption}}
-			\begin{tabular}{${l}}
-				${colums.join(' & ')}\\
-				${prepareContent.join('')}
-			\end{tabular}
-			\end{table}
+			\\begin{center}
+				\\begin{tabular}{ ${l} }
+					${this.lines ? '\\hline' : ''}
+					${colums.join(' & ')} \\\\
+					${prepareContent.join('')}
+				\\end{tabular}
+			\\end{center}
 		`;
 	}
 
-	toLatex(html?: string, dirname?: string) {
-		var $;
+	/**
+	 * Converts many html tables into latex tables
+	 * @param html 
+	 * @param dirname 
+	 */
+	public toLatex(html?: string, dirname?: string): Array<string> {
+		var $, templates_list: Array<string> = [];
 		if (dirname === void 0 && this.contentHtml) {
 			$ = cheerio.load(this.contentHtml);
 		} else if (html === void 0) {
@@ -55,21 +81,35 @@ export class HtmlTableToLatex {
 				(cheerio.load(tr))("td").each((i, td) => {
 					rows_temp.push($(td).text());
 				});
-				rows_temp.length >= this.minLengthColumnsByRow? rows.push(rows_temp) : null;
+				rows_temp.length >= this.minLengthColumnsByRow ? rows.push(rows_temp) : null;
 			})
 			// console.log("Content:", rows);
 			let template_temp = this.toTableLatex(
-				caption || 'Caption ' + i, 
+				caption || 'Caption ' + i,
 				columnsText,
 				rows
 			);
-			console.log("Item", i, caption, "\nTemplate:", template_temp);
+			templates_list.push(template_temp);
+			// console.log("Item", i, caption, "\nTemplate:", template_temp);
 		});
-		return
+		return templates_list;
+	}
+
+	public latex(dirname: string) {
+		return new Promise((resolve, reject) => {
+			this.prepare(dirname).then(_ => {
+				return resolve(this.toLatex());
+			}, err => reject(err));
+		})
+	}
+
+	public save(dirname: string, content: string, cb?: Function) {
+		fs.writeFile(dirname, content, cb);
 	}
 }
 
 var hl = new HtmlTableToLatex();
-hl.prepare("export.html").then(html => {
-	hl.toLatex();
+hl.latex("export.html").then(latex => {
+	// console.log("Latex", latex);
+	hl.save('latex.tex', latex.join('\n'));
 });

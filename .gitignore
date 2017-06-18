@@ -1,5 +1,7 @@
 # Others
 *.html
+*.tex
+*.log
 
 # Logs
 logs
