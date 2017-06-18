@@ -16,6 +16,12 @@
     "tables",
     "html"
   ],
+  "files": [
+    "index.js",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
   "author": "\u001ba@anlijudavid <anlijudavid@hotmail.com>",
   "license": "MIT",
   "bugs": {

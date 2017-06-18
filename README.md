@@ -67,6 +67,32 @@ httl.latex("mytables.html").then(latex => {
 \end{center}
 ```
 
+## API
+
+### constructor(args) -> `HtmlTableToLatex`
+
+| Param | Type | Description | Default |
+| ----- | ---- | ----------- | ------- |
+| minLengthColumnsByRow | number | Take into account only columns by minimum size in text | 3 |
+| separator | string | Table columns size. i.e: `l, c, r` | l |
+| lines | boolean | Show lines | `true` |
+
+#### Example
+```js
+var HtmlTableToLatex = require('htmltabletolatex').HtmlTableToLatex;
+
+var httl = new HtmlTableToLatex(2, 'l', false);
+```
+
+**You can also change the parameters without the need of a constructor:**
+```js
+var httl = require('htmltabletolatex').HTTL;
+
+httl.lines = false;
+httl.minLengthColumnsByRow = 2;
+httl.separator = 'l';
+```
+
 ## Colaborate
 ```bash
 # Fork it this repo

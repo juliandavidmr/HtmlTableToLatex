@@ -1,9 +1,7 @@
 // httl => HtmlTableToLatex 
-var httl = require('./').HTTL;
+var HtmlTableToLatex = require('./').HtmlTableToLatex;
 
-httl.lines = false;
-httl.minLengthColumnsByRow = 2;
-httl.separator = 'l';
+var httl = new HtmlTableToLatex(2, 'l', false);
 
 httl.latex("export.html").then(latex => {
 	// console.log("Latex", latex);
