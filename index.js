@@ -32,6 +32,19 @@ var HtmlTableToLatex = (function () {
             });
         });
     };
+    HtmlTableToLatex.prototype.camelize = function (string) {
+        return string.replace(/(?:^|[-_ :])(\w)/g, function (_, c) {
+            return c ? c.toUpperCase() : '';
+        });
+    };
+    HtmlTableToLatex.prototype.camelizeList = function (list) {
+        var _this = this;
+        return list.map(function (item) { return _this.camelize(item); });
+    };
+    HtmlTableToLatex.prototype.camelizeRows = function (rows) {
+        var _this = this;
+        return rows.map(function (sub_list) { return sub_list.map(function (str) { return _this.camelize(str); }); });
+    };
     /**
      * Returns a latex table
      * @param caption
@@ -42,10 +55,13 @@ var HtmlTableToLatex = (function () {
         var _this = this;
         if (colums === void 0) { colums = []; }
         if (rowContent === void 0) { rowContent = []; }
+        caption = this.camelize(caption).trim();
+        colums = this.camelizeList(colums);
+        rowContent = this.camelizeRows(rowContent);
         var l = (this.lines ? '|' : '') + colums.map(function (_) { return 'l'; }).join(this.lines ? '|' : '') + (this.lines ? '|' : '');
         var prepareContent = [];
         rowContent.map(function (row) { return prepareContent.push(row.join(' & ') + ("\\\\ " + (_this.lines ? '\\hline' : '') + " \n")); });
-        return "\n\t\t\t\\begin{center}\n\t\t\t\t\\begin{tabular}{ " + l + " }\n\t\t\t\t\t" + (this.lines ? '\\hline' : '') + "\n\t\t\t\t\t" + colums.join(' & ') + " \\\\\n\t\t\t\t\t" + prepareContent.join('') + "\n\t\t\t\t\\end{tabular}\n\t\t\t\\end{center}\n\t\t";
+        return "\n\t\t\t\\begin{center}\n\t\t\t\t\\caption{table" + this.camelize(caption) + "}\n        \\label{label" + this.camelize(caption) + "}\n\t\t\t\t\\begin{tabular}{ " + l + " }\n\t\t\t\t\t" + (this.lines ? '\\hline' : '') + "\n\t\t\t\t\t" + colums.join(' & ') + " \\\\\n\t\t\t\t\t" + prepareContent.join('') + "\n\t\t\t\t\\end{tabular}\n\t\t\t\\end{center}\n\t\t";
     };
     /**
      * Converts many html tables into latex tables
@@ -81,6 +97,10 @@ var HtmlTableToLatex = (function () {
         });
         return templates_list;
     };
+    /**
+     * Convert content file html to latex
+     * @param dirname
+     */
     HtmlTableToLatex.prototype.latex = function (dirname) {
         var _this = this;
         return new Promise(function (resolve, reject) {
@@ -89,6 +109,12 @@ var HtmlTableToLatex = (function () {
             }, function (err) { return reject(err); });
         });
     };
+    /**
+     * Save file
+     * @param dirname
+     * @param content
+     * @param cb callback
+     */
     HtmlTableToLatex.prototype.save = function (dirname, content, cb) {
         fs.writeFile(dirname, content, cb);
     };

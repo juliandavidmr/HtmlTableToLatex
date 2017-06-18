@@ -15,5 +15,4 @@ $ node index.js
 # => A latex file called "latex.tex" is automatically generated
 ```
 
-
-License MIT
+**License MIT**
